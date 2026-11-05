@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магията на Дробите - 5. клас</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-top: 20px;
+            border: 2px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Comic Neue', cursive;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.5rem; }
+
+        .screen {
+            display: none !important;
+        }
+
+        .screen.active {
+            display: block !important;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .avatar-option {
+            background: #f9fafb;
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .avatar-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--secondary);
+        }
+
+        .avatar-option.selected {
+            border-color: var(--primary);
+            background: #e0e7ff;
+            transform: scale(1.05);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2);
+        }
+        .btn-secondary:hover {
+            background: #0284c7;
+        }
+
+        .user-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media(min-width: 600px) {
+            .levels-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .level-card {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+        }
+
+        .level-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .timer-box {
+            background: #fee2e2;
+            color: var(--danger);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question-container {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            margin: 0 4px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .numerator {
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 2px;
+        }
+
+        .denominator {
+            padding-top: 2px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media(min-width: 600px) {
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-letter {
+            background: #e2e8f0;
+            color: var(--text-main);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .option-btn.correct {
+            background: #d1fae5 !important;
+            border-color: var(--success) !important;
+            color: #065f46;
+        }
+
+        .option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #991b1b;
+        }
+
+        .powerups-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .powerup-btn {
+            background: #fef3c7;
+            border: 2px solid var(--accent);
+            color: #b45309;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .powerup-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .explanation-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            font-size: 1rem;
+            color: #166534;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- ЕКРАН 1: РЕГИСТРАЦИЯ -->
+        <div id="screen-login" class="screen active">
+            <h1>✨ Магията на Дробите ✨</h1>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Влез в света на петокласните магьосници и овладей дробите!</p>
+            
+            <div class="form-group">
+                <label for="username">Твоето име или псевдоним:</label>
+                <input type="text" id="username" placeholder="Напр. Магьосник Иван..." maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label>Избери си аватар:</label>
+                <div class="avatar-grid" id="avatar-grid">
+                    <div class="avatar-option selected" data-avatar="🧙‍♂️">🧙‍♂️</div>
+                    <div class="avatar-option" data-avatar="🧙‍♀️">🧙‍♀️</div>
+                    <div class="avatar-option" data-avatar="🔮">🔮</div>
+                    <div class="avatar-option" data-avatar="🐉">🐉</div>
+                </div>
+            </div>
+
+            <button class="btn" id="start-game-btn">Влез в играта!</button>
+        </div>
+
+        <!-- ЕКРАН 2: ГЛАВНО МЕНЮ И НИВА -->
+        <div id="screen-menu" class="screen">
+            <div class="user-info-bar">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="display-avatar" style="font-size: 2rem;">🧙‍♂️</span>
+                    <div>
+                        <h3 id="display-name" style="margin: 0; text-align: left;">Име</h3>
+                        <span id="display-title" style="font-size: 0.9rem; color: var(--primary); font-weight: bold;">Чирак на дробите</span>
+                    </div>
+                </div>
+                <div>
+                    <span style="font-weight: bold; color: var(--accent);">⭐ <span id="display-score">0</span> т.</span>
+                </div>
+            </div>
+
+            <h2>Избери магическо ниво</h2>
+            <div class="levels-grid">
+                <div class="level-card" onclick="window.startLevel(1)">
+                    <h3>Ниво 1</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Правилни и неправилни дроби</p>
+                    <span style="display: inline-block; margin-top: 10px; font-size: 0.85rem; font-weight: bold; color: var(--success);" id="lvl1-status">Отключено</span>
+                </div>
+                <div class="level-card locked" id="card-lvl2" onclick="window.startLevel(2)">
+                    <h3>Ниво 2</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Разширяване и съкращаване</p>
+                    <span style="display: inline-block; margin-top: 10px; font-size: 0.85rem; font-weight: bold; color: var(--danger);" id="lvl2-status">Заключено 🔒</span>
+                </div>
+                <div class="level-card locked" id="card-lvl3" onclick="window.startLevel(3)">
+                    <h3>Ниво 3</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">НОЗ и сравняване по числител</p>
+                    <span style="display: inline-block; margin-top: 10px; font-size: 0.85rem; font-weight: bold; color: var(--danger);" id="lvl3-status">Заключено 🔒</span>
+                </div>
+                <div class="level-card locked" id="card-lvl4" onclick="window.startLevel(4)">
+                    <h3>Ниво 4</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Магическа арена (Преговор)</p>
+                    <span style="display: inline-block; margin-top: 10px; font-size: 0.85rem; font-weight: bold; color: var(--danger);" id="lvl4-status">Заключено 🔒</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3>🏆 Зала на славата (Класиране в реално време)</h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Място</th>
+                            <th>Магьосник</th>
+                            <th>Точки</th>
+                            <th>Титла</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr><td colspan="4" style="text-align: center;">Зареждане на класирането...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ЕКРАН 3: ИГРА / КВИЗ -->
+        <div id="screen-quiz" class="screen">
+            <div class="quiz-header">
+                <span id="quiz-level-title">Ниво 1</span>
+                <span id="quiz-progress">Въпрос 1 / 10</span>
+                <div class="timer-box">
+                    ⏱️ <span id="time-left">45</span>s
+                </div>
+            </div>
+
+            <div class="powerups-bar">
+                <button class="powerup-btn" id="powerup-time" onclick="window.useTimePowerup()">⏳ +10 сек (+10т.)</button>
+                <button class="powerup-btn" id="powerup-fifty" onclick="window.useFiftyPowerup()">⚡ 50/50 (-2 грешни)</button>
+            </div>
+
+            <div class="question-container" id="question-text">
+                Тук ще се появи въпросът...
+            </div>
+
+            <div class="options-grid" id="options-grid"></div>
+
+            <div class="explanation-box" id="explanation-box">
+                <strong>Обяснение:</strong> <span id="explanation-text"></span>
+            </div>
+
+            <button class="btn btn-secondary" id="next-question-btn" style="margin-top: 20px; display: none;" onclick="window.nextQuestion()">Следващ въпрос ➡️</button>
+        </div>
+
+        <!-- ЕКРАН 4: ЗАВЪРШЕНО НИВО -->
+        <div id="screen-result" class="screen" style="text-align: center;">
+            <h2>🎉 Нивото е завършено! 🎉</h2>
+            <div id="super-math-badge" style="display: none; background: #d1fae5; color: #065f46; border: 2px solid #10b981; padding: 12px; border-radius: 12px; font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">
+                🌟 Браво, ти си супер математик! 🌟
+            </div>
+            <p id="result-message" style="font-size: 1.2rem; margin: 20px 0; color: var(--text-muted);">Ти се справи отлично!</p>
+            <div style="font-size: 3rem; margin: 20px 0; font-weight: bold; color: var(--primary);" id="result-score-display">+0 точки</div>
+            <button class="btn" onclick="window.returnToMenu()">Към главното меню 🏰</button>
+        </div>
+    </div>
+
+    <!-- Firebase & Game Engine Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuOz9S4xd7qENBJ2oaCmvp49cSz4jCLAI",
+            authDomain: "magic-e9874.firebaseapp.com",
+            databaseURL: "https://magic-e9874-default-rtdb.firebaseio.com",
+            projectId: "magic-e9874",
+            storageBucket: "magic-e9874.firebasestorage.app",
+            messagingSenderId: "264808213414",
+            appId: "1:264808213414:web:ad2d8f60f23f5d9b5abd67",
+            measurementId: "G-GHPND6N6RS"
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+        } catch (e) {}
+
+        let audioCtx = null;
+        function playSound(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (type === 'correct') {
+                    let now = audioCtx.currentTime;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    let now = audioCtx.currentTime;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'win') {
+                    let notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, index) => {
+                        let now = audioCtx.currentTime + index * 0.12;
+                        let osc = audioCtx.createOscillator();
+                        let gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.25);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        let currentUser = { name: "", avatar: "🧙‍♂️", score: 0, unlockedLevel: 1 };
+        let currentLevel = 1;
+        let currentQuestionIndex = 0;
+        let scoreThisLevel = 0;
+        let timer = null;
+        let timeLeft = 45;
+        let powerupTimeUsed = false;
+        let powerupFiftyUsed = false;
+        let activeQuestions = [];
+
+        function f(num, den) {
+            return `<span class="fraction"><span class="numerator">${num}</span><span class="denominator">${den}</span></span>`;
+        }
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function buildQuestion(questionText, correctAnsStr, wrongAnswersList, explanationText, uniqueKey = "") {
+            let uniqueSet = new Set();
+            uniqueSet.add(correctAnsStr);
+
+            let shuffledWrongs = shuffleArray(wrongAnswersList.filter(w => w !== correctAnsStr));
+            for (let w of shuffledWrongs) {
+                if (uniqueSet.size < 4) {
+                    uniqueSet.add(w);
+                }
+            }
+
+            let safetyCounter = 0;
+            while (uniqueSet.size < 4 && safetyCounter < 50) {
+                let extraNum = randInt(1, 10);
+                let extraDen = randInt(extraNum + 1, 15);
+                let candidate = f(extraNum, extraDen);
+                if (candidate !== correctAnsStr) {
+                    uniqueSet.add(candidate);
+                }
+                safetyCounter++;
+            }
+
+            let optionsArr = shuffleArray(Array.from(uniqueSet));
+            let correctIndex = optionsArr.indexOf(correctAnsStr);
+
+            return {
+                q: questionText,
+                options: optionsArr,
+                correct: correctIndex,
+                explanation: explanationText,
+                key: uniqueKey
+            };
+        }
+
+        function getUniqueLevelQuestions(generatorFunc, count = 10) {
+            let questionsMap = new Map();
+            let attempts = 0;
+            while (questionsMap.size < count && attempts < 200) {
+                let q = generatorFunc();
+                if (q && !questionsMap.has(q.key)) {
+                    questionsMap.set(q.key, q);
+                }
+                attempts++;
+            }
+            return shuffleArray(Array.from(questionsMap.values()));
+        }
+
+        function generateLevel1Questions() {
+            let list = [];
+            for (let i = 0; i < 10; i++) {
+                let den = randInt(5, 15);
+                let num = randInt(1, den - 1);
+                let correctAns = f(num, den);
+                list.push(buildQuestion(
+                    `Коя от следните дроби е **правилна**?`,
+                    correctAns,
+                    [f(den, den), f(den + 1, den), f(den + 3, den), f(den + 2, Math.max(2, den - 1))],
+                    `Правилна е дробта, чийто числител е по-малък от знаменателя. Тук това е ${correctAns}.`,
+                    `l1_p_${num}_${den}`
+                ));
+            }
+            for (let i = 0; i < 10; i++) {
+                let den = randInt(3, 9);
+                let num = randInt(den + 1, den + 8);
+                let correctAns = f(num, den);
+                list.push(buildQuestion(
+                    `Коя от следните дроби е **неправилна**?`,
+                    correctAns,
+                    [f(randInt(1, den - 1), den), f(randInt(1, den - 2), den), f(1, den), f(randInt(1, den - 1), den + 2)],
+                    `Неправилна е дробта, чийто числител е по-голям или равен на знаменателя. Тук това е ${correctAns}.`,
+                    `l1_np_${num}_${den}`
+                ));
+            }
+            return getUniqueLevelQuestions(() => list[randInt(0, list.length - 1)], 10);
+        }
+
+        function generateLevel2Questions() {
+            let list = [];
+            for (let i = 0; i < 10; i++) {
+                let num = randInt(1, 3);
+                let den = randInt(num + 1, 6);
+                let mult = randInt(2, 4);
+                let correctAns = f(num * mult, den * mult);
+                list.push(buildQuestion(
+                    `Ако разширим дробта ${f(num, den)} с числото ${mult}, каква дроб ще получим?`,
+                    correctAns,
+                    [f(num + mult, den + mult), f(num * mult, den), f(num, den * mult), f(num + 1, den + 1)],
+                    `Умножаваме числителя и знаменателя с ${mult}: получава се ${correctAns}.`,
+                    `l2_ext_${num}_${den}_${mult}`
+                ));
+            }
+
+            for (let i = 0; i < 10; i++) {
+                let baseNum = randInt(1, 4);
+                let baseDen = randInt(baseNum + 1, 7);
+                if (gcd(baseNum, baseDen) !== 1) continue;
+
+                let div = randInt(2, 4);
+                let startNum = baseNum * div;
+                let startDen = baseDen * div;
+                let correctAns = f(baseNum, baseDen);
+
+                list.push(buildQuestion(
+                    `Съкрати дробта ${f(startNum, startDen)} до несъкратима дроб:`,
+                    correctAns,
+                    [f(baseNum + 1, baseDen), f(Math.max(1, startNum - 1), startDen), f(baseNum, baseDen + 1), f(baseNum * 2, baseDen * 2)],
+                    `Делим числителя и знаменателя на техния общ делител ${div}, за да получим несъкратимата дроб ${correctAns}.`,
+                    `l2_red_${startNum}_${startDen}`
+                ));
+            }
+            return getUniqueLevelQuestions(() => list[randInt(0, list.length - 1)], 10);
+        }
+
+        function generateLevel3Questions() {
+            let list = [];
+            const denominators = [
+                { d1: 2, d2: 3, noz: 6 },
+                { d1: 3, d2: 4, noz: 12 },
+                { d1: 2, d2: 5, noz: 10 },
+                { d1: 4, d2: 6, noz: 12 },
+                { d1: 3, d2: 5, noz: 15 },
+                { d1: 5, d2: 10, noz: 10 }
+            ];
+
+            denominators.forEach(pair => {
+                let correctAns = pair.noz.toString();
+                let wrong1 = (pair.noz + 2).toString();
+                let wrong2 = (pair.d1 * pair.d2).toString();
+                let wrong3 = Math.max(2, pair.noz - 3).toString();
+
+                let uniqueSet = new Set([correctAns, wrong1, wrong2, wrong3]);
+                let optionsArr = shuffleArray(Array.from(uniqueSet));
+                while(optionsArr.length < 4) {
+                    optionsArr.push((randInt(2, 20)).toString());
+                    optionsArr = Array.from(new Set(optionsArr));
+                }
+
+                list.push({
+                    q: `Кой е най-малкият общ знаменател (НОЗ) за дробите ${f(1, pair.d1)} и ${f(1, pair.d2)}?`,
+                    options: optionsArr,
+                    correct: optionsArr.indexOf(correctAns),
+                    explanation: `Най-малкото общо кратно на знаменателите ${pair.d1} и ${pair.d2} е ${pair.noz}.`,
+                    key: `l3_noz_${pair.d1}_${pair.d2}`
+                });
+            });
+
+            for (let i = 0; i < 10; i++) {
+                let num = randInt(2, 6);
+                let d1 = randInt(4, 8);
+                let d2 = d1 + randInt(1, 3);
+                let correctAns = f(num, d1);
+                list.push(buildQuestion(
+                    `Коя от следните дроби с еднакъв числител е по-голяма: ${f(num, d1)} или ${f(num, d2)}?`,
+                    correctAns,
+                    [f(num, d2), `Равни са`, `Не може да се определи`, f(num + 1, d1)],
+                    `При еднакви числители по-голяма е дробта с по-малък знаменател (${d1} < ${d2}), затова ${f(num, d1)} > ${f(num, d2)}.`,
+                    `l3_comp_${num}_${d1}_${d2}`
+                ));
+            }
+            return getUniqueLevelQuestions(() => list[randInt(0, list.length - 1)], 10);
+        }
+
+        function generateLevel4Questions() {
+            let list = [];
+            for (let i = 0; i < 10; i++) {
+                let baseNum = randInt(1, 3);
+                let baseDen = baseNum + randInt(1, 3);
+                let mult = randInt(2, 4);
+                let correctAns = f(baseNum * mult, baseDen * mult);
+                list.push(buildQuestion(
+                    `Коя от следните дроби е равна на ${f(baseNum, baseDen)}?`,
+                    correctAns,
+                    [f(baseNum, baseDen + 1), f(baseNum + 1, baseDen * mult), f(baseNum * mult, baseDen), f(baseNum + 2, baseDen + 2)],
+                    `Като разширим ${f(baseNum, baseDen)} с ${mult}, получаваме ${correctAns}.`,
+                    `l4_eq_${baseNum}_${baseDen}_${mult}`
+                ));
+            }
+
+            for (let i = 0; i < 10; i++) {
+                let d = randInt(4, 10);
+                let correctX = randInt(1, d - 1);
+                let num = correctX * 2;
+                let den = d * 2;
+                let correctAns = correctX.toString();
+                let wrong1 = (correctX + 1 > d ? 1 : correctX + 1).toString();
+                let wrong2 = (Math.max(1, correctX - 1)).toString();
+                let wrong3 = (d - correctX).toString();
+
+                let uniqueSet = new Set([correctAns, wrong1, wrong2, wrong3]);
+                let optionsArr = shuffleArray(Array.from(uniqueSet));
+                while(optionsArr.length < 4) {
+                    optionsArr.push((randInt(1, 12)).toString());
+                    optionsArr = Array.from(new Set(optionsArr));
+                }
+
+                list.push({
+                    q: `Ако е дадено, че ${f("x", d)} = ${f(num, den)}, колко е числото x?`,
+                    options: optionsArr,
+                    correct: optionsArr.indexOf(correctAns),
+                    explanation: `Дробта от дясната страна се съкращава до ${f(correctX, d)}, откъдето се вижда, че x = ${correctX}.`,
+                    key: `l4_x_${d}_${correctX}`
+                });
+            }
+            return getUniqueLevelQuestions(() => list[randInt(0, list.length - 1)], 10);
+        }
+
+        const levelsData = {
+            1: { title: "Ниво 1: Правилни и неправилни дроби", time: 45, getQuestions: generateLevel1Questions },
+            2: { title: "Ниво 2: Разширяване и съкращаване", time: 55, getQuestions: generateLevel2Questions },
+            3: { title: "Ниво 3: НОЗ и сравняване по числител", time: 70, getQuestions: generateLevel3Questions },
+            4: { title: "Ниво 4: Магическа арена (Преговор)", time: 75, getQuestions: generateLevel4Questions }
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatarOptions = document.querySelectorAll('.avatar-option');
+            avatarOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    avatarOptions.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    currentUser.avatar = opt.dataset.avatar;
+                });
+            });
+
+            const startBtn = document.getElementById('start-game-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', handleLogin);
+            }
+
+            const usernameInput = document.getElementById('username');
+            if (usernameInput) {
+                usernameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleLogin();
+                    }
+                });
+            }
+
+            // Показваме екран за вход при зареждане
+            showScreen('screen-login');
+        });
+
+        function handleLogin() {
+            const usernameInput = document.getElementById('username');
+            if (!usernameInput) return;
+            const nameVal = usernameInput.value.trim();
+            if (!nameVal) {
+                alert('Моля, въведи своето име или псевдоним!');
+                return;
+            }
+            currentUser.name = nameVal;
+            
+            try {
+                const saved = localStorage.getItem('magia_drobi_user_' + currentUser.name);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    currentUser.score = data.score || 0;
+                    currentUser.unlockedLevel = data.unlockedLevel || 1;
+                }
+            } catch(e) {}
+
+            updateMenuUI();
+            showScreen('screen-menu');
+        }
+
+        function updateMenuUI() {
+            const nameEl = document.getElementById('display-name');
+            const avatarEl = document.getElementById('display-avatar');
+            const scoreEl = document.getElementById('display-score');
+            const titleEl = document.getElementById('display-title');
+
+            if (nameEl) nameEl.innerText = currentUser.name;
+            if (avatarEl) avatarEl.innerText = currentUser.avatar;
+            if (scoreEl) scoreEl.innerText = currentUser.score;
+
+            let title = "Чирак на дробите";
+            if (currentUser.score >= 400) title = "Върховен архимаг 👑";
+            else if (currentUser.score >= 250) title = "Магьосник на дробите 🔮";
+            else if (currentUser.score >= 100) title = "Асистент по знаменатели 📜";
+            if (titleEl) titleEl.innerText = title;
+
+            for (let i = 2; i <= 4; i++) {
+                const card = document.getElementById(`card-lvl${i}`);
+                const status = document.getElementById(`lvl${i}-status`);
+                if (card && status) {
+                    if (currentUser.unlockedLevel >= i) {
+                        card.classList.remove('locked');
+                        status.innerText = "Отключено ✅";
+                        status.style.color = "var(--success)";
+                    } else {
+                        card.classList.add('locked');
+                        status.innerText = "Заключено 🔒";
+                        status.style.color = "var(--danger)";
+                    }
+                }
+            }
+        }
+
+        window.startLevel = function(lvl) {
+            if (currentUser.unlockedLevel < lvl) {
+                alert('Това ниво е заключено! Завърши предходното ниво, за да го отключиш.');
+                return;
+            }
+            currentLevel = lvl;
+            currentQuestionIndex = 0;
+            scoreThisLevel = 0;
+            powerupTimeUsed = false;
+            powerupFiftyUsed = false;
+
+            const timeBtn = document.getElementById('powerup-time');
+            const fiftyBtn = document.getElementById('powerup-fifty');
+            if (timeBtn) timeBtn.disabled = false;
+            if (fiftyBtn) fiftyBtn.disabled = false;
+
+            activeQuestions = levelsData[lvl].getQuestions();
+            const levelTitleEl = document.getElementById('quiz-level-title');
+            if (levelTitleEl) levelTitleEl.innerText = levelsData[lvl].title;
+
+            showScreen('screen-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= activeQuestions.length) {
+                endLevel();
+                return;
+            }
+
+            const qData = activeQuestions[currentQuestionIndex];
+            const progressEl = document.getElementById('quiz-progress');
+            const questionTextEl = document.getElementById('question-text');
+            if (progressEl) progressEl.innerText = `Въпрос ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            if (questionTextEl) questionTextEl.innerHTML = qData.q;
+
+            const optionsGrid = document.getElementById('options-grid');
+            if (!optionsGrid) return;
+            optionsGrid.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                const letters = ['A', 'B', 'C', 'D'];
+                btn.innerHTML = `<div class="option-letter">${letters[idx]}</div> <div>${opt}</div>`;
+                btn.onclick = () => selectAnswer(idx);
+                optionsGrid.appendChild(btn);
+            });
+
+            const explBox = document.getElementById('explanation-box');
+            const nextBtn = document.getElementById('next-question-btn');
+            if (explBox) explBox.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+
+            clearInterval(timer);
+            timeLeft = levelsData[currentLevel].time;
+            const timeLeftEl = document.getElementById('time-left');
+            if (timeLeftEl) timeLeftEl.innerText = timeLeft;
+
+            timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeftEl) timeLeftEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selectedIndex) {
+            clearInterval(timer);
+            const qData = activeQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === qData.correct) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (selectedIndex === qData.correct) {
+                scoreThisLevel += 10;
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+
+            const explText = document.getElementById('explanation-text');
+            const explBox = document.getElementById('explanation-box');
+            const nextBtn = document.getElementById('next-question-btn');
+
+            if (explText) explText.innerHTML = qData.explanation;
+            if (explBox) explBox.style.display = 'block';
+            if (nextBtn) nextBtn.style.display = 'block';
+        }
+
+        function handleTimeout() {
+            playSound('wrong');
+            const qData = activeQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === qData.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            const explText = document.getElementById('explanation-text');
+            const explBox = document.getElementById('explanation-box');
+            const nextBtn = document.getElementById('next-question-btn');
+
+            if (explText) explText.innerHTML = "Времето изтече! " + qData.explanation;
+            if (explBox) explBox.style.display = 'block';
+            if (nextBtn) nextBtn.style.display = 'block';
+        }
+
+        window.nextQuestion = function() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        window.useTimePowerup = function() {
+            if (powerupTimeUsed) return;
+            powerupTimeUsed = true;
+            const timeBtn = document.getElementById('powerup-time');
+            if (timeBtn) timeBtn.disabled = true;
+            timeLeft += 10;
+            const timeLeftEl = document.getElementById('time-left');
+            if (timeLeftEl) timeLeftEl.innerText = timeLeft;
+        }
+
+        window.useFiftyPowerup = function() {
+            if (powerupFiftyUsed) return;
+            powerupFiftyUsed = true;
+            const fiftyBtn = document.getElementById('powerup-fifty');
+            if (fiftyBtn) fiftyBtn.disabled = true;
+
+            const qData = activeQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            let removedCount = 0;
+
+            buttons.forEach((btn, idx) => {
+                if (idx !== qData.correct && removedCount < 2) {
+                    btn.style.opacity = '0.2';
+                    btn.disabled = true;
+                    removedCount++;
+                }
+            });
+        }
+
+        function endLevel() {
+            currentUser.score += scoreThisLevel;
+            
+            if (scoreThisLevel >= 50 && currentUser.unlockedLevel === currentLevel && currentLevel < 4) {
+                currentUser.unlockedLevel = currentLevel + 1;
+            }
+
+            try {
+                localStorage.setItem('magia_drobi_user_' + currentUser.name, JSON.stringify({
+                    score: currentUser.score,
+                    unlockedLevel: currentUser.unlockedLevel
+                }));
+
+                if (db) {
+                    const scoreRef = push(ref(db, 'scores'));
+                    set(scoreRef, {
+                        name: currentUser.name,
+                        avatar: currentUser.avatar,
+                        score: currentUser.score,
+                        levelReached: currentLevel,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch(e) {}
+
+            playSound('win');
+
+            const superMathBadge = document.getElementById('super-math-badge');
+            if (scoreThisLevel >= 90) {
+                if (superMathBadge) superMathBadge.style.display = 'block';
+                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            } else {
+                if (superMathBadge) superMathBadge.style.display = 'none';
+                if (scoreThisLevel >= 70) {
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                }
+            }
+
+            const resultMsg = document.getElementById('result-message');
+            const resultScore = document.getElementById('result-score-display');
+            if (resultMsg) resultMsg.innerText = `Ти спечели ${scoreThisLevel} точки в това ниво!`;
+            if (resultScore) resultScore.innerText = `Общ резултат: ${currentUser.score} т.`;
+            showScreen('screen-result');
+        }
+
+        window.returnToMenu = function() {
+            updateMenuUI();
+            showScreen('screen-menu');
+        }
+
+        if (db) {
+            onValue(ref(db, 'scores'), (snapshot) => {
+                const data = snapshot.val();
+                const tbody = document.getElementById('leaderboard-body');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                if (!data) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Все още няма регистрирани резултати.</td></tr>`;
+                    return;
+                }
+
+                let usersMap = {};
+                Object.values(data).forEach(item => {
+                    if (!usersMap[item.name] || usersMap[item.name].score < item.score) {
+                        usersMap[item.name] = item;
+                    }
+                });
+
+                let sortedUsers = Object.values(usersMap).sort((a, b) => b.score - a.score);
+
+                sortedUsers.slice(0, 10).forEach((user, index) => {
+                    let title = "Чирак на дробите";
+                    if (user.score >= 400) title = "Върховен архимаг 👑";
+                    else if (user.score >= 250) title = "Магьосник на дробите 🔮";
+                    else if (user.score >= 100) title = "Асистент по знаменатели 📜";
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><b>#${index + 1}</b></td>
+                        <td>${user.avatar} ${user.name}</td>
+                        <td><b>${user.score}</b> т.</td>
+                        <td>${title}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
